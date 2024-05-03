@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ product.name }}</h1>
+<p>{{ product.description }}</p>
+<p>Cantidad: {{ product.quantity }}</p>
+<p>Precio: {{ product.price }}</p>
+<form method="POST" action="{% url 'delete_product' product.id %}">
+    {% csrf_token %}
+    <button type="submit">Eliminar producto</button>
+</form>
+{% endblock %}

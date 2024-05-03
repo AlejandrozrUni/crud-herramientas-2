@@ -29,10 +29,11 @@ urlpatterns = [
     path('tasks/<int:task_id>/', views.task_detail,name='task_detail'),
     path('tasks/<int:task_id>/complete', views.complete_task,name='complete_task'),
     path('tasks/<int:task_id>/delete', views.delete_task,name='delete_task'),
-    path('signin/', views.signin,name='signin'), 
-    path('productos/', views.lista_productos, name='lista_productos'),
-    path('producto/nuevo/', views.nuevo_producto, name='nuevo_producto'),
-    path('producto/editar/<int:id>/', views.editar_producto, name='editar_producto'),
-    path('producto/eliminar/<int:id>/', views.eliminar_producto, name='eliminar_producto'),
+    path('signin/', views.signin,name='signin'),
+    path('products/', views.products, name='products'),
+    path('products/create/', views.create_product, name='create_product'),
+    path('products/<int:product_id>/', views.product_detail, name='product_detail'),
+    path('products/<int:product_id>/delete', views.delete_product, name='delete_product'),
 ]
+
 

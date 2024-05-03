@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
 from django.db import IntegrityError
 from .forms import TaskForm, ProductoForm
-from .models import Task, Producto
+from .models import Task, Product
 from django.utils import timezone
 # Create your views here.
 def home(request):
@@ -120,34 +120,51 @@ def signin(request):
             login(request, user)
             return redirect('tasks')
 
-def lista_productos(request):
-    productos = Producto.objects.all()
-    return render(request, 'inventario/lista_productos.html', {'productos': productos})
+def products(request):
+    products = Product.objects.filter(user=request.user)
+    return render(request, 'products.html', {'products': products})
 
-def nuevo_producto(request):
-    if request.method == "POST":
-        form = ProductoForm(request.POST)
-        if form.is_valid():
-            producto = form.save(commit=False)
-            producto.save()
-            return redirect('lista_productos')
+def create_product(request):
+    if request.method == 'GET':
+        return render(request, 'create_product.html', {
+            'form': ProductoForm
+        })
     else:
-        form = ProductoForm()
-    return render(request, 'inventario/nuevo_producto.html', {'form': form})
+        try:
+            form = ProductoForm(request.POST)
+            new_product = form.save(commit=False)
+            new_product.user = request.user
+            new_product.save()
+            return redirect('products')
+        except ValueError:
+            return render(request, 'create_product.html', {
+                'form': ProductoForm,
+                'error': 'Datos proporcionados no válidos'
+            })
 
-def editar_producto(request, pk):
-    producto = get_object_or_404(Producto, pk=pk)
-    if request.method == "POST":
-        form = ProductoForm(request.POST, instance=producto)
-        if form.is_valid():
-            producto = form.save(commit=False)
-            producto.save()
-            return redirect('lista_productos')
+def product_detail(request, product_id):
+    if request.method == 'GET':
+        product = get_object_or_404(Product, pk=product_id, user=request.user)
+        form = ProductoForm(instance=product)
+        return render(request, 'product_detail.html', {
+            'product': product,
+            'form': form
+        })
     else:
-        form = ProductoForm(instance=producto)
-    return render(request, 'inventario/editar_producto.html', {'form': form})
+        try:
+            product = get_object_or_404(Product, pk=product_id, user=request.user)
+            form = ProductoForm(request.POST, instance=product)
+            form.save()
+            return redirect('products')
+        except ValueError:
+            return render(request, 'product_detail.html', {
+                'product': product,
+                'form': form,
+                'error': 'Error al actualizar el producto'
+            })
 
-def eliminar_producto(request, pk):
-    producto = get_object_or_404(Producto, pk=pk)
-    producto.delete()
-    return redirect('lista_productos')
+def delete_product(request, product_id):
+    product = get_object_or_404(Product, pk=product_id, user=request.user)
+    if request.method == 'POST':
+        product.delete()
+        return redirect('products')

@@ -1,5 +1,6 @@
+from django import forms
 from django.forms import ModelForm
-from .models import Task, Producto
+from .models import Task, Product
 
 
 class TaskForm(ModelForm):
@@ -7,7 +8,7 @@ class TaskForm(ModelForm):
         model = Task
         fields = ['title', 'description', 'important']
         
-class ProductoForm(ModelForm):
+class ProductoForm(forms.ModelForm):
     class Meta:
-        model = Producto
-        fields = ['nombre', 'cantidad', 'precio']
+        model = Product
+        fields = ['name', 'description', 'price', 'quantity']
